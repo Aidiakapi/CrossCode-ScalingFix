@@ -15,21 +15,37 @@ $Patches = @(
   [PSCustomObject]@{
     File = '.\assets\js\game.compiled.js'
     Changes = @(
+      # `c` is the pixel scaling passed in the constructor of ig.System
+      # When initializing, set the canvas' renderingMode to pixelated
       [PSCustomObject]@{
-        Original = '{ORIGINAL:0,SCALE_X2:1,FIT:2,STRETCH:3};'
-        Patched  = '{ORIGINAL:0,SCALE_X2:1,FIT:2,STRETCH:3,INTEGER:4};'
+        Original = 'c=c||1;this.width=a;this.height=b;'
+        Patched  = 'c=1;this.canvas.style.imageRendering="pixelated";this.width=a;this.height=b;'
       }
+      # This loads the setting setting for pixel scale, force it to always be 1
       [PSCustomObject]@{
-        Original = 'sc.PIXEL_SIZE={ONE:0,TWO:1,THREE:2,FOUR:3};'
-        Patched  = 'sc.PIXEL_SIZE={ONE:0,TWO:1,THREE:2,FOUR:3,FIVE:4,SIX:5};'
+        Original = 'window.IG_GAME_SCALE=(this.values[a]||0)+1;'
+        Patched  = 'window.IG_GAME_SCALE=1+0*((this.values[a]||0)+1);'
       }
+      # This seems to load a legacy setting that doubled the pixel count, modify
+      # the string so it never matches.
       [PSCustomObject]@{
-        Original = 'else if(a=="pixel-size"){window.IG_GAME_SCALE=(this.values[a]||0)+1;localStorage.setItem("options.scale",window.IG_GAME_SCALE)}'
-        Patched  = 'else if(a=="pixel-size"){window.IG_GAME_SCALE=(this.values[a]||0)+1;localStorage.setItem("options.scale",window.IG_GAME_SCALE);this._setDisplaySize();}'
+        Original = '"double-pixels"'
+        Patched  = '"double-pixels__REMOVED"'
       }
+      # Make a check with == sc.PIXEL_SIZE.TWO always fail
       [PSCustomObject]@{
-        Original = 'case sc.DISPLAY_TYPE.STRETCH:k=true;a=b;b=i;j=true;break;default:a=c;b=d'
-        Patched  = 'case sc.DISPLAY_TYPE.STRETCH:k=true;a=b;b=i;j=true;break;case sc.DISPLAY_TYPE.INTEGER:j=true;if(b>c*window.IG_GAME_SCALE&&i>d*window.IG_GAME_SCALE){a=c*window.IG_GAME_SCALE;b=d*window.IG_GAME_SCALE}else if(Math.floor(b/c)==0||Math.floor(i/d)==0){a=c;b=d}else{if(b/c<i/d){a=c*Math.floor(b/c);b=d*Math.floor(b/c)}else{a=c*Math.floor(i/d);b=d*Math.floor(i/d)}}break;default:a=c;b=d'
+        Original = 'var b=sc.options.get("min-sidebar")&&sc.options.get("pixel-size")==sc.PIXEL_SIZE.TWO;'
+        Patched  = 'var b=false&&sc.options.get("min-sidebar")&&sc.options.get("pixel-size")==sc.PIXEL_SIZE.TWO;'
+      }
+      # Make a check with == sc.PIXEL_SIZE.ONE always succeed
+      [PSCustomObject]@{
+        Original = 'sc.options.get("pixel-size")==sc.PIXEL_SIZE.ONE'
+        Patched  = '(true||sc.options.get("pixel-size")==sc.PIXEL_SIZE.ONE)'
+      }
+      # Modify the "Double" scaling mode to instead be an integer scaling mode
+      [PSCustomObject]@{
+        Original = 'case sc.DISPLAY_TYPE.SCALE_X2:a=c*2;b=d*2;break;'
+        Patched  = 'case sc.DISPLAY_TYPE.SCALE_X2:const m=Math.max(Math.min(Math.floor(b/c),Math.floor(i/d)),1);a=c*m;b=d*m;break;'
       }
     )
     Content = $null
@@ -37,13 +53,10 @@ $Patches = @(
   [PSCustomObject]@{
     File = '.\assets\data\lang\sc\gui.en_US.json'
     Changes = @(
+      # Rename the "Double" scaling mode to "Integer"
       [PSCustomObject]@{
         Original = '"display-type":{"name":"Display Type","group":["Original","Double","Fit","Stretch"]'
-        Patched  = '"display-type":{"name":"Display Type","group":["Original","Double","Fit","Stretch","Integer"]'
-      },
-      [PSCustomObject]@{
-        Original = '"pixel-size":{"name":"Pixel Size","group":["1","2","3","4"]'
-        Patched  = '"pixel-size":{"name":"Pixel Size","group":["1","2","3","4","5","6"]'
+        Patched  = '"display-type":{"name":"Display Type","group":["Original","Integer","Fit","Stretch"]'
       }
     )
     Content = $null
