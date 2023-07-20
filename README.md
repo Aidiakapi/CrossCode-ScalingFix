@@ -23,14 +23,14 @@ less severe, but it doesn't solve it.</sub>
 
 ## Instructions
 
-*Confirmed working with build ID 8631542 on Steam, Windows (27th of April 2022). May or may not work with copies on other platforms.*
+*Confirmed working with build ID 11438847 on Steam, Windows (10th of June 2023). May or may not work with copies on other platforms.*
 
 1. Download the **Install-ScalingFix.ps1** script file and place it in the game folder.
 
 2. Right click it and select **Run with PowerShell**.
 
 3. If you want to uninstall at some point, you can run **Uninstall-ScalingFix.ps1**. Alternatively, you can validate files on Steam,
-   which undo any modifications made to the game.
+   which will undo any modifications made to the game.
 
 [1]: https://raw.githubusercontent.com/Aidiakapi/CrossCode-ScalingFix/main/comparisons/full_original.png
 [2]: https://raw.githubusercontent.com/Aidiakapi/CrossCode-ScalingFix/main/comparisons/full_pixelated.png

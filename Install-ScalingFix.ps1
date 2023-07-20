@@ -18,29 +18,8 @@ $Patches = @(
       # `c` is the pixel scaling passed in the constructor of ig.System
       # When initializing, set the canvas' renderingMode to pixelated
       [PSCustomObject]@{
-        Original = 'c=c||1;this.width=a;this.height=b;'
-        Patched  = 'c=1;this.canvas.style.imageRendering="pixelated";this.width=a;this.height=b;'
-      }
-      # This loads the setting setting for pixel scale, force it to always be 1
-      [PSCustomObject]@{
-        Original = 'window.IG_GAME_SCALE=(this.values[a]||0)+1;'
-        Patched  = 'window.IG_GAME_SCALE=1+0*((this.values[a]||0)+1);'
-      }
-      # This seems to load a legacy setting that doubled the pixel count, modify
-      # the string so it never matches.
-      [PSCustomObject]@{
-        Original = '"double-pixels"'
-        Patched  = '"double-pixels__REMOVED"'
-      }
-      # Make a check with == sc.PIXEL_SIZE.TWO always fail
-      [PSCustomObject]@{
-        Original = 'var b=sc.options.get("min-sidebar")&&sc.options.get("pixel-size")==sc.PIXEL_SIZE.TWO;'
-        Patched  = 'var b=false&&sc.options.get("min-sidebar")&&sc.options.get("pixel-size")==sc.PIXEL_SIZE.TWO;'
-      }
-      # Make a check with == sc.PIXEL_SIZE.ONE always succeed
-      [PSCustomObject]@{
-        Original = 'sc.options.get("pixel-size")==sc.PIXEL_SIZE.ONE'
-        Patched  = '(true||sc.options.get("pixel-size")==sc.PIXEL_SIZE.ONE)'
+        Original = 'this.height=b;if(this.imageSmoothingDisabled){'
+        Patched  = 'this.height=b;this.canvas.style.imageRendering="pixelated";if(this.imageSmoothingDisabled){'
       }
       # Modify the "Double" scaling mode to instead be an integer scaling mode
       [PSCustomObject]@{
